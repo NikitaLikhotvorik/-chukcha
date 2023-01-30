@@ -37,24 +37,42 @@ import sys
 
 import requests
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel
 
-SCREEN_SIZE = [700, 550]
+SCREEN_SIZE = [1200, 550]
 
 
 class Example(QWidget):
     def __init__(self):
         super().__init__()
+        self.lon = "30.536280"
+        self.lat = "59.774005"
+        self.delta = "9"
         self.getImage()
         self.initUI()
 
-    def getImage(self):
-        map_request = "http://static-maps.yandex.ru/1.x/?ll=37.530887,55.703118&spn=0.002,0.002&l=map"
-        response = requests.get(map_request)
+    def getImage(self, delta_type=None):
+        api_server = "http://static-maps.yandex.ru/1.x/"
+        print(self.lon)
+        if delta_type is not None and delta_type == '-':
+            self.delta = str(int(self.delta) - 1)
+            print(self.delta)
+        elif delta_type is not None and delta_type == '+':
+            self.delta = str(int(self.delta) + 1)
+            print(self.delta)
+
+        params = {
+            "ll": f"{self.lon},{self.lat}",
+            "z": self.delta,
+            "l": "map"
+        }
+        print(api_server + str(params))
+        response = requests.get(api_server, params=params)
 
         if not response:
             print("Ошибка выполнения запроса:")
-            print(map_request)
+            print(response)
             print("Http статус:", response.status_code, "(", response.reason, ")")
             sys.exit(1)
 
@@ -77,6 +95,17 @@ class Example(QWidget):
     def closeEvent(self, event):
         """При закрытии формы подчищаем за собой"""
         os.remove(self.map_file)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_PageUp:
+            self.getImage(delta_type='+')
+            self.pixmap = QPixmap("map.png")
+            self.image.setPixmap(self.pixmap)
+        if event.key() == Qt.Key_PageDown:
+            self.getImage(delta_type='-')
+            self.pixmap = QPixmap("map.png")
+            self.image.setPixmap(self.pixmap)
+        self.update()
 
 
 if __name__ == '__main__':
