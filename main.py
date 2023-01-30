@@ -1,23 +1,18 @@
 """import os
 import sys
-
 import pygame
 import requests
-
 map_request = "http://static-maps.yandex.ru/1.x/?ll=30.536280%2C59.774005&spn=10,10&l=map"
 response = requests.get(map_request)
-
 if not response:
     print("Ошибка выполнения запроса:")
     print(map_request)
     print("Http статус:", response.status_code, "(", response.reason, ")")
     sys.exit(1)
-
 # Запишем полученное изображение в файл.
 map_file = "map.png"
 with open(map_file, "wb") as file:
     file.write(response.content)
-
 # Инициализируем pygame
 pygame.init()
 screen = pygame.display.set_mode((600, 450))
@@ -28,7 +23,6 @@ pygame.display.flip()
 while pygame.event.wait().type != pygame.QUIT:
     pass
 pygame.quit()
-
 # Удаляем за собой файл с изображением.
 os.remove(map_file)
 """
@@ -48,6 +42,7 @@ class Example(QWidget):
         super().__init__()
         self.lon = "30.536280"
         self.lat = "59.774005"
+        self.mv = 0.1
         self.delta = "9"
         self.getImage()
         self.initUI()
@@ -101,11 +96,18 @@ class Example(QWidget):
             self.getImage(delta_type='-')
             self.pixmap = QPixmap("map.png")
             self.image.setPixmap(self.pixmap)
+        if event.key() == Qt.Key_Down:
+            self.lon = int(self.lon) + self.mv
+        if event.key() == Qt.Key_Up:
+            self.lon = int(self.lon) - self.mv
+        if event.key() == Qt.Key_Right:
+            self.lat = int(self.lat) + self.mv
+        if event.key() == Qt.Key_Left:
+            self.lat = int(self.lat) - self.mv
         self.update()
 
 
 if __name__ == '__main__':
-    print('a')
     app = QApplication(sys.argv)
     ex = Example()
     ex.show()
