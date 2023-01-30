@@ -39,7 +39,7 @@ import requests
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel
 
-SCREEN_SIZE = [600, 450]
+SCREEN_SIZE = [700, 550]
 
 
 class Example(QWidget):
@@ -70,7 +70,7 @@ class Example(QWidget):
         ## Изображение
         self.pixmap = QPixmap(self.map_file)
         self.image = QLabel(self)
-        self.image.move(0, 0)
+        self.image.move(50, 50)
         self.image.resize(600, 450)
         self.image.setPixmap(self.pixmap)
 
