@@ -54,20 +54,16 @@ class Example(QWidget):
 
     def getImage(self, delta_type=None):
         api_server = "http://static-maps.yandex.ru/1.x/"
-        print(self.lon)
-        if delta_type is not None and delta_type == '-':
+        if delta_type is not None and int(self.delta) - 1 >= 0 and delta_type == '-':
             self.delta = str(int(self.delta) - 1)
-            print(self.delta)
-        elif delta_type is not None and delta_type == '+':
+        elif delta_type is not None and int(self.delta) + 1 <= 17 and delta_type == '+':
             self.delta = str(int(self.delta) + 1)
-            print(self.delta)
 
         params = {
             "ll": f"{self.lon},{self.lat}",
             "z": self.delta,
             "l": "map"
         }
-        print(api_server + str(params))
         response = requests.get(api_server, params=params)
 
         if not response:
