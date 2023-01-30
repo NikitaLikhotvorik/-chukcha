@@ -105,6 +105,7 @@ class Example(QWidget):
 
 
 if __name__ == '__main__':
+    print('a')
     app = QApplication(sys.argv)
     ex = Example()
     ex.show()
