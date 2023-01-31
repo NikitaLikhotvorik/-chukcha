@@ -40,19 +40,12 @@ SCREEN_SIZE = [1200, 550]
 class Example(QWidget):
     def __init__(self):
         super().__init__()
-        self.widget = QWidget()
         self.lon = "30.536280"
         self.lat = "59.774005"
         self.mv = 0.1
         self.delta = "9"
         self.getImage()
         self.initUI()
-
-        self.params = {
-            "ll": f"{self.lon},{self.lat}",
-            "z": self.delta,
-            "l": "map"
-        }
 
     def getImage(self, delta_type=None):
         api_server = "http://static-maps.yandex.ru/1.x/"
@@ -61,8 +54,12 @@ class Example(QWidget):
         elif delta_type is not None and int(self.delta) + 1 <= 17 and delta_type == '+':
             self.delta = str(int(self.delta) + 1)
 
-
-        response = requests.get(api_server, params=self.params)
+        params = {
+            "ll": f"{self.lon},{self.lat}",
+            "z": self.delta,
+            "l": "map"
+        }
+        response = requests.get(api_server, params=params)
 
         if not response:
             print("Ошибка выполнения запроса:")
@@ -86,21 +83,6 @@ class Example(QWidget):
         self.image.resize(600, 450)
         self.image.setPixmap(self.pixmap)
 
-        self.button1 = QPushButton(self.widget)
-        self.button1.setText("Схема")
-        self.button1.move(650, 50)
-        self.button1.clicked.connect(button1_clicked)
-
-        self.button2 = QPushButton(self.widget)
-        self.button2.setText("Спутник")
-        self.button2.move(650, 150)
-        self.button2.clicked.connect(button2_clicked)
-
-        self.button3 = QPushButton(self.widget)
-        self.button3.setText("Гибрид")
-        self.button3.move(650, 250)
-        self.button3.clicked.connect(button3_clicked)
-
     def closeEvent(self, event):
         """При закрытии формы подчищаем за собой"""
         os.remove(self.map_file)
@@ -108,34 +90,28 @@ class Example(QWidget):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_PageUp:
             self.getImage(delta_type='+')
-            self.pixmap = QPixmap("map.png")
-            self.image.setPixmap(self.pixmap)
         if event.key() == Qt.Key_PageDown:
             self.getImage(delta_type='-')
-            self.pixmap = QPixmap("map.png")
-            self.image.setPixmap(self.pixmap)
         if event.key() == Qt.Key_Down:
-            self.lon = int(self.lon) + self.mv
+            self.lat = float(self.lat) - self.mv
         if event.key() == Qt.Key_Up:
-            self.lon = int(self.lon) - self.mv
+            self.lat = float(self.lat) + self.mv
         if event.key() == Qt.Key_Right:
-            self.lat = int(self.lat) + self.mv
+            self.lon = float(self.lon) + self.mv
         if event.key() == Qt.Key_Left:
-            self.lat = int(self.lat) - self.mv
+            self.lon = float(self.lon) - self.mv
         self.update()
+        self.getImage()
+        self.pixmap = QPixmap("map.png")
+        self.image.setPixmap(self.pixmap)
 
-    def button1_clicked(self):
-        self.params["l"] = "map"
 
-    def button1_clicked(self):
-        self.params["l"] = "sat"
-
-    def button1_clicked(self):
-        self.params["l"] = "skl"
-
+def except_hook(cls, exception, traceback):
+    sys.__excepthook__(cls, exception, traceback)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = Example()
-    ex.show()
+    form = Example()
+    form.show()
+    sys.excepthook = except_hook
     sys.exit(app.exec())
