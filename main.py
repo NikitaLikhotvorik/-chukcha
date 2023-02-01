@@ -32,7 +32,7 @@ import sys
 import requests
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton
 
 SCREEN_SIZE = [1200, 550]
 
@@ -72,6 +72,15 @@ class Example(QWidget):
         with open(self.map_file, "wb") as file:
             file.write(response.content)
 
+    def button1_clicked(self):
+        self.params["l"] = "map"
+
+    def button2_clicked(self):
+        self.params["l"] = "sat"
+
+    def button3_clicked(self):
+        self.params["l"] = "skl"
+
     def initUI(self):
         self.setGeometry(100, 100, *SCREEN_SIZE)
         self.setWindowTitle('Отображение карты')
@@ -82,6 +91,21 @@ class Example(QWidget):
         self.image.move(50, 50)
         self.image.resize(600, 450)
         self.image.setPixmap(self.pixmap)
+
+        self.button1 = QPushButton(self.map_file)
+        self.button1.setText("Схема")
+        self.button1.move(150, 50)
+        self.button1.clicked.connect(self.button1_clicked)
+
+        self.button2 = QPushButton(self.map_file)
+        self.button2.setText("Спутник")
+        self.button2.move(150, 150)
+        self.button2.clicked.connect(self.button2_clicked)
+
+        self.button3 = QPushButton(self.map_file)
+        self.button3.setText("Гибрид")
+        self.button3.move(150, 250)
+        self.button3.clicked.connect(self.button3_clicked)
 
     def closeEvent(self, event):
         """При закрытии формы подчищаем за собой"""
