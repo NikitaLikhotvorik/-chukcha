@@ -47,19 +47,19 @@ class Example(QWidget):
         self.getImage()
         self.initUI()
 
-    def getImage(self, delta_type=None):
+    def getImage(self, delta_type=None, map_type='map'):
         api_server = "http://static-maps.yandex.ru/1.x/"
         if delta_type is not None and int(self.delta) - 1 >= 0 and delta_type == '-':
             self.delta = str(int(self.delta) - 1)
         elif delta_type is not None and int(self.delta) + 1 <= 17 and delta_type == '+':
             self.delta = str(int(self.delta) + 1)
 
-        params = {
+        self.params = {
             "ll": f"{self.lon},{self.lat}",
             "z": self.delta,
-            "l": "map"
+            "l": map_type
         }
-        response = requests.get(api_server, params=params)
+        response = requests.get(api_server, params=self.params)
 
         if not response:
             print("Ошибка выполнения запроса:")
@@ -73,13 +73,19 @@ class Example(QWidget):
             file.write(response.content)
 
     def button1_clicked(self):
-        self.params["l"] = "map"
+        self.getImage(map_type='map')
+        self.pixmap = QPixmap("map.png")
+        self.image.setPixmap(self.pixmap)
 
     def button2_clicked(self):
-        self.params["l"] = "sat"
+        self.getImage(map_type="sat")
+        self.pixmap = QPixmap("map.png")
+        self.image.setPixmap(self.pixmap)
 
     def button3_clicked(self):
-        self.params["l"] = "skl"
+        self.getImage(map_type="skl")
+        self.pixmap = QPixmap("map.png")
+        self.image.setPixmap(self.pixmap)
 
     def initUI(self):
         self.setGeometry(100, 100, *SCREEN_SIZE)
@@ -92,19 +98,19 @@ class Example(QWidget):
         self.image.resize(600, 450)
         self.image.setPixmap(self.pixmap)
 
-        self.button1 = QPushButton(self.map_file)
+        self.button1 = QPushButton(self)
         self.button1.setText("Схема")
-        self.button1.move(150, 50)
+        self.button1.move(1050, 50)
         self.button1.clicked.connect(self.button1_clicked)
 
-        self.button2 = QPushButton(self.map_file)
+        self.button2 = QPushButton(self)
         self.button2.setText("Спутник")
-        self.button2.move(150, 150)
+        self.button2.move(1050, 150)
         self.button2.clicked.connect(self.button2_clicked)
 
-        self.button3 = QPushButton(self.map_file)
+        self.button3 = QPushButton(self)
         self.button3.setText("Гибрид")
-        self.button3.move(150, 250)
+        self.button3.move(1050, 250)
         self.button3.clicked.connect(self.button3_clicked)
 
     def closeEvent(self, event):
