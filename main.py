@@ -33,6 +33,7 @@ import requests
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton
+import keyword
 
 SCREEN_SIZE = [1200, 550]
 
@@ -46,6 +47,7 @@ class Example(QWidget):
         self.delta = "9"
         self.getImage()
         self.initUI()
+        self.map_type = 'map'
 
     def getImage(self, delta_type=None, map_type='map'):
         api_server = "http://static-maps.yandex.ru/1.x/"
@@ -74,16 +76,19 @@ class Example(QWidget):
 
     def button1_clicked(self):
         self.getImage(map_type='map')
+        self.map_type = 'map'
         self.pixmap = QPixmap("map.png")
         self.image.setPixmap(self.pixmap)
 
     def button2_clicked(self):
         self.getImage(map_type="sat")
+        self.map_type = 'sat'
         self.pixmap = QPixmap("map.png")
         self.image.setPixmap(self.pixmap)
 
     def button3_clicked(self):
         self.getImage(map_type="skl")
+        self.map_type = 'skl'
         self.pixmap = QPixmap("map.png")
         self.image.setPixmap(self.pixmap)
 
@@ -119,19 +124,19 @@ class Example(QWidget):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_PageUp:
-            self.getImage(delta_type='+')
+            self.getImage(map_type=self.map_type, delta_type='+')
         if event.key() == Qt.Key_PageDown:
-            self.getImage(delta_type='-')
-        if event.key() == Qt.Key_Down:
+            self.getImage(map_type=self.map_type, delta_type='-')
+        if event.key() == Qt.Key_S:
             self.lat = float(self.lat) - self.mv
-        if event.key() == Qt.Key_Up:
+        if event.key() == Qt.Key_W:
             self.lat = float(self.lat) + self.mv
-        if event.key() == Qt.Key_Right:
+        if event.key() == Qt.Key_D:
             self.lon = float(self.lon) + self.mv
-        if event.key() == Qt.Key_Left:
+        if event.key() == Qt.Key_A:
             self.lon = float(self.lon) - self.mv
         self.update()
-        self.getImage()
+        self.getImage(map_type=self.map_type)
         self.pixmap = QPixmap("map.png")
         self.image.setPixmap(self.pixmap)
 
