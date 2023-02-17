@@ -7,7 +7,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QTextEdit
 import keyword
 
-SCREEN_SIZE = [1200, 550]
+SCREEN_SIZE = [1300, 550]
 
 
 class Example(QWidget):
@@ -58,6 +58,11 @@ class Example(QWidget):
         self.tx = QTextEdit(self)
         self.tx.move(670, 50)
 
+        self.button5 = QPushButton(self)
+        self.button5.setText("СБРОС")
+        self.button5.move(950, 100)
+        self.button5.clicked.connect(self.button5_clicked)
+
     def getImage(self, delta_type=None, map_type='map'):
         api_server = "http://static-maps.yandex.ru/1.x/?"
         if delta_type is not None and int(self.delta) - 1 >= 0 and delta_type == '-':
@@ -100,6 +105,13 @@ class Example(QWidget):
     def button3_clicked(self):
         self.getImage(map_type="skl")
         self.map_type = 'skl'
+        self.update()
+
+    def button5_clicked(self):
+        if len(self.pts) >= 1:
+            del self.pts[-1]
+        self.ptsres = '~'.join(self.pts)
+        self.getImage(map_type=self.map_type)
         self.update()
 
     def search_clicked(self):
