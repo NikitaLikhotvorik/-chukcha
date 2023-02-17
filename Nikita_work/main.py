@@ -19,9 +19,11 @@ class Example(QWidget):
         self.delta = "9"
         self.map_type = 'map'
         self.map_file = "map.png"
+        self.pts = []
+        self.pts.append(str(self.lon + ',' + self.lat))
+        self.ptsres = '~'.join(self.pts)
         self.initUI()
         self.getImage()
-        self.pts = []
 
     def initUI(self):
         self.setGeometry(100, 100, *SCREEN_SIZE)
@@ -66,8 +68,10 @@ class Example(QWidget):
         self.params = {
             "ll": f"{self.lon},{self.lat}",
             "z": self.delta,
-            "l": map_type
+            "l": map_type,
+            "pt": self.ptsres
         }
+
         response = requests.get(api_server, params=self.params)
 
         if not response:
@@ -86,20 +90,17 @@ class Example(QWidget):
     def button1_clicked(self):
         self.getImage(map_type='map')
         self.map_type = 'map'
-        self.pixmap = QPixmap("map.png")
-        self.image.setPixmap(self.pixmap)
+        self.update()
 
     def button2_clicked(self):
         self.getImage(map_type="sat")
         self.map_type = 'sat'
-        self.pixmap = QPixmap("map.png")
-        self.image.setPixmap(self.pixmap)
+        self.update()
 
     def button3_clicked(self):
         self.getImage(map_type="skl")
         self.map_type = 'skl'
-        self.pixmap = QPixmap("map.png")
-        self.image.setPixmap(self.pixmap)
+        self.update()
 
     def search_clicked(self):
         geocoder_request = f"https://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b" \
@@ -114,9 +115,13 @@ class Example(QWidget):
             toponym_coodrinates = toponym["Point"]["pos"]
             self.lat = toponym_coodrinates.split()[1]
             self.lon = toponym_coodrinates.split()[0]
-            self.params['z'] = 12
+            self.params['z'] = 9
+            self.pts.append(str(self.lon + ',' + self.lat))
+            self.ptsres = '~'.join(self.pts)
+            self.params["pt"] = self.ptsres
+            print(self.ptsres)
             self.map_request = f"http://static-maps.yandex.ru/1.x/?ll={self.lon},{self.lat}&z={self.params['z']}&l={self.params['l']}" \
-                               f"&pt={self.lon},{self.lat}"
+                               f"&pt={self.ptsres}"
         response = requests.get(self.map_request)
         if not response:
             print("Ошибка выполнения запроса:")
