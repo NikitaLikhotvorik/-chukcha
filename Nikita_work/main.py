@@ -1,31 +1,3 @@
-"""import os
-import sys
-import pygame
-import requests
-map_request = "http://static-maps.yandex.ru/1.x/?ll=30.536280%2C59.774005&spn=10,10&l=map"
-response = requests.get(map_request)
-if not response:
-    print("Ошибка выполнения запроса:")
-    print(map_request)
-    print("Http статус:", response.status_code, "(", response.reason, ")")
-    sys.exit(1)
-# Запишем полученное изображение в файл.
-map_file = "map.png"
-with open(map_file, "wb") as file:
-    file.write(response.content)
-# Инициализируем pygame
-pygame.init()
-screen = pygame.display.set_mode((600, 450))
-# Рисуем картинку, загружаемую из только что созданного файла.
-screen.blit(pygame.image.load(map_file), (0, 0))
-# Переключаем экран и ждем закрытия окна.
-pygame.display.flip()
-while pygame.event.wait().type != pygame.QUIT:
-    pass
-pygame.quit()
-# Удаляем за собой файл с изображением.
-os.remove(map_file)
-"""
 import os
 import sys
 
@@ -45,74 +17,16 @@ class Example(QWidget):
         self.lat = "59.774005"
         self.mv = 0.1
         self.delta = "9"
-        self.getImage()
-        self.initUI()
         self.map_type = 'map'
-        self.pts = []
-
-    def getImage(self, delta_type=None, map_type='map', crds=False):
-        key = "40d1649f-0493-4b70-98ba-98533de7710b"
-        if crds:
-            crds = str(crds)
-            geocoder_request = f"https://geocode-maps.yandex.ru/1.x/?apikey={key}&geocode={crds}&format=json"
-        api_server = "http://static-maps.yandex.ru/1.x/"
-        if delta_type is not None and int(self.delta) - 1 >= 0 and delta_type == '-':
-            self.delta = str(int(self.delta) - 1)
-        elif delta_type is not None and int(self.delta) + 1 <= 17 and delta_type == '+':
-            self.delta = str(int(self.delta) + 1)
-
-        self.params = {
-            "ll": f"{self.lon},{self.lat}",
-            "z": self.delta,
-            "l": map_type
-        }
-        response = requests.get(api_server, params=self.params)
-        if crds:
-            print(geocoder_request)
-            response = requests.get(geocoder_request, params=self.params)
-
-        if not response:
-            print("Ошибка выполнения запроса:")
-            print(response)
-            print("Http статус:", response.status_code, "(", response.reason, ")")
-            sys.exit(1)
-
-        # Запишем полученное изображение в файл.
         self.map_file = "map.png"
-        with open(self.map_file, "wb") as file:
-            file.write(response.content)
-
-    def button1_clicked(self):
-        self.getImage(map_type='map')
-        self.map_type = 'map'
-        self.pixmap = QPixmap("map.png")
-        self.image.setPixmap(self.pixmap)
-
-    def button2_clicked(self):
-        self.getImage(map_type="sat")
-        self.map_type = 'sat'
-        self.pixmap = QPixmap("map.png")
-        self.image.setPixmap(self.pixmap)
-
-    def button3_clicked(self):
-        self.getImage(map_type="skl")
-        self.map_type = 'skl'
-        self.pixmap = QPixmap("map.png")
-        self.image.setPixmap(self.pixmap)
-
-    def search_clicked(self):
-        self.crd = self.tx.toPlainText()
-        #self.pts.append()
-        self.pixmap = QPixmap("map.png")
-        #self.image.setPixmap(self.pixmap)
-        self.update()
-        self.getImage(map_type=self.map_type, crds=self.crd)
+        self.initUI()
+        self.getImage()
+        self.pts = []
 
     def initUI(self):
         self.setGeometry(100, 100, *SCREEN_SIZE)
         self.setWindowTitle('Отображение карты')
 
-        ## Изображение
         self.pixmap = QPixmap(self.map_file)
         self.image = QLabel(self)
         self.image.move(50, 50)
@@ -141,6 +55,80 @@ class Example(QWidget):
 
         self.tx = QTextEdit(self)
         self.tx.move(670, 50)
+
+    def getImage(self, delta_type=None, map_type='map'):
+        api_server = "http://static-maps.yandex.ru/1.x/?"
+        if delta_type is not None and int(self.delta) - 1 >= 0 and delta_type == '-':
+            self.delta = str(int(self.delta) - 1)
+        elif delta_type is not None and int(self.delta) + 1 <= 17 and delta_type == '+':
+            self.delta = str(int(self.delta) + 1)
+
+        self.params = {
+            "ll": f"{self.lon},{self.lat}",
+            "z": self.delta,
+            "l": map_type
+        }
+        response = requests.get(api_server, params=self.params)
+
+        if not response:
+            print("Ошибка выполнения запроса:")
+            print(response)
+            print("Http статус:", response.status_code, "(", response.reason, ")")
+            sys.exit(1)
+
+        self.map_file = "map.png"
+        with open(self.map_file, "wb") as file:
+            file.write(response.content)
+
+        self.pixmap = QPixmap(self.map_file)
+        self.image.setPixmap(self.pixmap)
+
+    def button1_clicked(self):
+        self.getImage(map_type='map')
+        self.map_type = 'map'
+        self.pixmap = QPixmap("map.png")
+        self.image.setPixmap(self.pixmap)
+
+    def button2_clicked(self):
+        self.getImage(map_type="sat")
+        self.map_type = 'sat'
+        self.pixmap = QPixmap("map.png")
+        self.image.setPixmap(self.pixmap)
+
+    def button3_clicked(self):
+        self.getImage(map_type="skl")
+        self.map_type = 'skl'
+        self.pixmap = QPixmap("map.png")
+        self.image.setPixmap(self.pixmap)
+
+    def search_clicked(self):
+        geocoder_request = f"https://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b" \
+                           f"&geocode={self.tx.toPlainText()}&format=json"
+
+        response = requests.get(geocoder_request)
+        if response:
+            json_response = response.json()
+
+            toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+            toponym_address = toponym["metaDataProperty"]["GeocoderMetaData"]["text"]
+            toponym_coodrinates = toponym["Point"]["pos"]
+            self.lat = toponym_coodrinates.split()[1]
+            self.lon = toponym_coodrinates.split()[0]
+            self.params['z'] = 12
+            self.map_request = f"http://static-maps.yandex.ru/1.x/?ll={self.lon},{self.lat}&z={self.params['z']}&l={self.params['l']}" \
+                               f"&pt={self.lon},{self.lat}"
+        response = requests.get(self.map_request)
+        if not response:
+            print("Ошибка выполнения запроса:")
+            print(response)
+            print("Http статус:", response.status_code, "(", response.reason, ")")
+            sys.exit(1)
+        self.map_file = 'map.png'
+        with open(self.map_file, "wb") as file:
+            file.write(response.content)
+        self.pixmap = QPixmap(self.map_file)
+        self.image.setPixmap(self.pixmap)
+        self.update()
 
     def closeEvent(self, event):
         """При закрытии формы подчищаем за собой"""
