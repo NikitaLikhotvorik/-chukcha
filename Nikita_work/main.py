@@ -4,7 +4,7 @@ import sys
 import requests
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QTextEdit
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QTextEdit, QCheckBox
 import keyword
 
 SCREEN_SIZE = [1300, 550]
@@ -55,8 +55,16 @@ class Example(QWidget):
         self.button4.move(950, 50)
         self.button4.clicked.connect(self.search_clicked)
 
+        self.button6 = QCheckBox(self)
+        self.button6.setText("Вывод индекса")
+        self.button6.move(1050, 400)
+
         self.tx = QTextEdit(self)
         self.tx.move(670, 50)
+
+        self.adress = QLabel(self)
+        self.adress.setGeometry(50, 500, 600, 50)
+        # self.adress.move(50, 525)
 
         self.button5 = QPushButton(self)
         self.button5.setText("СБРОС")
@@ -124,7 +132,15 @@ class Example(QWidget):
 
             toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
             toponym_address = toponym["metaDataProperty"]["GeocoderMetaData"]["text"]
+            if self.button6.isChecked():
+                try:
+                    toponym_postcode = toponym["metaDataProperty"]["GeocoderMetaData"]["Address"]["postal_code"]
+                    toponym_address += ', индекс: ' + toponym_postcode
+                except KeyError:
+                    pass
             toponym_coodrinates = toponym["Point"]["pos"]
+            print(toponym_address)
+            self.adress.setText(toponym_address)
             self.lat = toponym_coodrinates.split()[1]
             self.lon = toponym_coodrinates.split()[0]
             self.params['z'] = 9
@@ -157,13 +173,20 @@ class Example(QWidget):
         if event.key() == Qt.Key_PageDown:
             self.getImage(map_type=self.map_type, delta_type='-')
         if event.key() == Qt.Key_S:
+            print(self.lon, self.lat)
             self.lat = float(self.lat) - self.mv
+            print(self.lon, self.lat)
         if event.key() == Qt.Key_W:
+            print(self.lon, self.lat)
             self.lat = float(self.lat) + self.mv
+            print(self.lon, self.lat)
         if event.key() == Qt.Key_D:
+            print(self.lon, self.lat)
             self.lon = float(self.lon) + self.mv
         if event.key() == Qt.Key_A:
+            print(self.lon, self.lat)
             self.lon = float(self.lon) - self.mv
+            print(self.lon, self.lat)
         self.update()
         self.getImage(map_type=self.map_type)
         self.pixmap = QPixmap("map.png")
