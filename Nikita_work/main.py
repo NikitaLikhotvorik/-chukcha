@@ -140,7 +140,10 @@ class Example(QWidget):
                     pass
             toponym_coodrinates = toponym["Point"]["pos"]
             print(toponym_address)
-            self.adress.setText(toponym_address)
+            if self.button6.isChecked():
+                self.adress.setText(toponym_address + ' ' + toponym_coodrinates)
+            else:
+                self.adress.setText('')
             self.lat = toponym_coodrinates.split()[1]
             self.lon = toponym_coodrinates.split()[0]
             self.params['z'] = 9
