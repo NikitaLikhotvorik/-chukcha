@@ -53,7 +53,7 @@ class Example(QWidget):
         self.button4 = QPushButton(self)
         self.button4.setText("Искать")
         self.button4.move(950, 50)
-        self.button4.clicked.connect(lambda: self.search_clicked(place_mark=True))
+        self.button4.clicked.connect(self.search_clicked)
 
         self.button6 = QCheckBox(self)
         self.button6.setText("Вывод индекса")
@@ -154,11 +154,8 @@ class Example(QWidget):
             self.params["pt"] = self.ptsres
             print(self.ptsres)
             print(place_mark)
-            if place_mark:
-                self.map_request = f"http://static-maps.yandex.ru/1.x/?ll={self.lon},{self.lat}&z={self.params['z']}&l={self.params['l']}" \
+            self.map_request = f"http://static-maps.yandex.ru/1.x/?ll={self.lon},{self.lat}&z={self.params['z']}&l={self.params['l']}" \
                                f"&pt={self.ptsres}"
-            else:
-                self.map_request = f"http://static-maps.yandex.ru/1.x/?ll={self.lon},{self.lat}&z={self.params['z']}&l={self.params['l']}"
         response = requests.get(self.map_request)
         if not response:
             print("Ошибка выполнения запроса:")
