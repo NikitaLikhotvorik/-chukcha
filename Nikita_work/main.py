@@ -58,6 +58,7 @@ class Example(QWidget):
         self.button6 = QCheckBox(self)
         self.button6.setText("Вывод индекса")
         self.button6.move(1050, 400)
+        self.button6.stateChanged.connect(lambda: self.search_clicked())
 
         self.tx = QTextEdit(self)
         self.tx.move(670, 50)
@@ -143,7 +144,7 @@ class Example(QWidget):
             if self.button6.isChecked():
                 self.adress.setText(toponym_address + ' ' + toponym_coodrinates)
             else:
-                self.adress.setText('')
+                self.adress.setText(toponym_address)
             self.lat = toponym_coodrinates.split()[1]
             self.lon = toponym_coodrinates.split()[0]
             self.params['z'] = 9
