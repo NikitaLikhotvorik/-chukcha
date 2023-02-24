@@ -121,6 +121,7 @@ class Example(QWidget):
             del self.pts[-1]
         self.ptsres = '~'.join(self.pts)
         self.getImage(map_type=self.map_type)
+        self.adress.setText('')
         self.update()
 
     def search_clicked(self):
