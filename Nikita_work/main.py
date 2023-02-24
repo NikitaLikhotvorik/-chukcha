@@ -53,12 +53,12 @@ class Example(QWidget):
         self.button4 = QPushButton(self)
         self.button4.setText("Искать")
         self.button4.move(950, 50)
-        self.button4.clicked.connect(self.search_clicked)
+        self.button4.clicked.connect(lambda: self.search_clicked(place_mark=True))
 
         self.button6 = QCheckBox(self)
         self.button6.setText("Вывод индекса")
         self.button6.move(1050, 400)
-        self.button6.stateChanged.connect(lambda: self.search_clicked())
+        self.button6.stateChanged.connect(lambda: self.search_clicked(place_mark=False))
 
         self.tx = QTextEdit(self)
         self.tx.move(670, 50)
@@ -124,7 +124,7 @@ class Example(QWidget):
         self.adress.setText('')
         self.update()
 
-    def search_clicked(self):
+    def search_clicked(self, place_mark=True):
         geocoder_request = f"https://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b" \
                            f"&geocode={self.tx.toPlainText()}&format=json"
 
@@ -153,8 +153,12 @@ class Example(QWidget):
             self.ptsres = '~'.join(self.pts)
             self.params["pt"] = self.ptsres
             print(self.ptsres)
-            self.map_request = f"http://static-maps.yandex.ru/1.x/?ll={self.lon},{self.lat}&z={self.params['z']}&l={self.params['l']}" \
+            print(place_mark)
+            if place_mark:
+                self.map_request = f"http://static-maps.yandex.ru/1.x/?ll={self.lon},{self.lat}&z={self.params['z']}&l={self.params['l']}" \
                                f"&pt={self.ptsres}"
+            else:
+                self.map_request = f"http://static-maps.yandex.ru/1.x/?ll={self.lon},{self.lat}&z={self.params['z']}&l={self.params['l']}"
         response = requests.get(self.map_request)
         if not response:
             print("Ошибка выполнения запроса:")
