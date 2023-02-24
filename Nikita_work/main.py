@@ -53,12 +53,12 @@ class Example(QWidget):
         self.button4 = QPushButton(self)
         self.button4.setText("Искать")
         self.button4.move(950, 50)
-        self.button4.clicked.connect(self.search_clicked)
+        self.button4.clicked.connect(lambda: self.search_clicked(place_mark='pull'))
 
         self.button6 = QCheckBox(self)
         self.button6.setText("Вывод индекса")
         self.button6.move(1050, 400)
-        self.button6.stateChanged.connect(lambda: self.search_clicked(place_mark=False))
+        self.button6.stateChanged.connect(lambda: self.search_clicked(place_mark='not_pull'))
 
         self.tx = QTextEdit(self)
         self.tx.move(670, 50)
@@ -124,7 +124,7 @@ class Example(QWidget):
         self.adress.setText('')
         self.update()
 
-    def search_clicked(self, place_mark=True):
+    def search_clicked(self, place_mark='pull'):
         geocoder_request = f"https://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b" \
                            f"&geocode={self.tx.toPlainText()}&format=json"
 
@@ -149,7 +149,8 @@ class Example(QWidget):
             self.lat = toponym_coodrinates.split()[1]
             self.lon = toponym_coodrinates.split()[0]
             self.params['z'] = 9
-            self.pts.append(str(self.lon + ',' + self.lat))
+            if place_mark == 'pull':
+                self.pts.append(str(self.lon + ',' + self.lat))
             self.ptsres = '~'.join(self.pts)
             self.params["pt"] = self.ptsres
             print(self.ptsres)
